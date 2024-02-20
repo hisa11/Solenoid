@@ -12,9 +12,7 @@ public:
 private:
     CAN& can;
     BufferedSerial& serial;
-    int16_t pwm0[4] = {0, 0, 0, 0}; // モタドラ1
-    int16_t pwm1[4] = {0, 0, 0, 0}; // モダドラ2
-    int16_t pwm2[4] = {0, 0, 0, 0}; // モダドラ3
-    uint8_t solenoid[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+    
+    uint8_t solenoid[8] = {0,0,0,0,0,0,0,0};
 };
 #endif
