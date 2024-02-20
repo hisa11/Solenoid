@@ -3,9 +3,6 @@
 void SolenoidController::run() {
     while (1)
     {
-        CANMessage msg0{0xf2, (const uint8_t *)2, 1};            // 左動作
-        CANMessage msg3{0xf2, (const uint8_t *)&solenoid[1], 1}; // 右動作
-
         if (serial.readable())
         {
             char buf;
@@ -13,38 +10,42 @@ void SolenoidController::run() {
 
             if (buf == 'x') // 左動作
             {
-                can.write(msg0);
-                printf("Message sent: %d\n", msg0.data[0]);
+                solenoid[2] = 1 ;
+                solenoid[1] = 1 ;
             }
-            if (buf == 'v') // 右停止
+            else if (buf == 'v') // 右停止
             {
-                can.write(msg3);
-                printf("Message sent: %d\n", msg3.data[0]);
+                solenoid[2] = 2;
+                solenoid[1] = 2;
             }
+            else if (buf == 'e') // 右停止
+            {
+                solenoid[0] = 1;
+                // solenoid[1] = 2;
+            }
+            else if (buf == 'd') // 右停止
+            {
+                solenoid[0] = 2;
+                // solenoid[1] = 2;
+            }
+            else if(buf == 'z'){
+                solenoid[1] = 0;
+                solenoid[2] = 0;
 
-            else if (buf == 'z' || buf == 'Q' || buf == 'A')
-            { // 停止
-                pwm0[0] = 0;
-                pwm0[1] = 0;
-                pwm0[2] = 0;
-                pwm0[3] = 0;
-
-                pwm1[0] = 0;
-                pwm1[1] = 0;
-                pwm1[2] = 0;
-                pwm1[3] = 0;
-
-                pwm2[3] = 0;
             }
         }
 
-        CANMessage msg10(2, (const uint8_t *)pwm0, 8);
-        CANMessage msg11(3, (const uint8_t *)pwm1, 8);
-        CANMessage msg12(1, (const uint8_t *)pwm2, 8);
+        // メッセージの作成
+        CANMessage msg3(0xf2, (const uint8_t *)&solenoid[0], 8); // solenoidの先頭から8バイトを送信
 
-        can.write(msg10);
-        can.write(msg11);
-        can.write(msg12);
+        // CANMessage msg10(2, (const uint8_t *)pwm0, 8);
+        // CANMessage msg11(3, (const uint8_t *)pwm1, 8);
+        // CANMessage msg12(1, (const uint8_t *)pwm2, 8);
+
+        // メッセージの送信
+        can.write(msg3);
+        // can.write(msg11);
+        // can.write(msg12);
 
         ThisThread::sleep_for(20ms);
     }
